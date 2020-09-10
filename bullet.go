@@ -25,10 +25,8 @@ func (b Bullet) newRequest(body io.Reader) (*http.Request, error) {
 	return request, nil
 }
 
-//Send push note with given title and text
-func (b Bullet) SendNote(title, text string) error {
-	note := NewNotePush(title, text)
-	reader, errReader := note.GetReader()
+func (b Bullet) send(push Push) error {
+	reader, errReader := push.GetReader()
 	if errReader != nil {
 		return errReader
 	}
@@ -57,4 +55,20 @@ func (b Bullet) SendNote(title, text string) error {
 	}
 
 	return nil
+}
+
+//Send push note with given title and text
+func (b Bullet) SendNote(title, text string) error {
+	note := NewNotePush(title, text)
+	err := b.send(note)
+
+	return err
+}
+
+//Send push link with given title, text and link
+func (b Bullet) SendLink(title, text, link string) error {
+	linkPush := NewLinkPush(title, text, link)
+	err := b.send(linkPush)
+
+	return err
 }

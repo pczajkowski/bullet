@@ -9,6 +9,7 @@ type Push struct {
 	Type  string `json:"type"`
 	Title string `json:"title"`
 	Body  string `json:"body"`
+	Url   string `json:"url"`
 }
 
 //GetReader
@@ -25,5 +26,11 @@ func (p Push) GetReader() (*bytes.Buffer, error) {
 //NewNotePush
 func NewNotePush(title, text string) Push {
 	push := Push{Type: "note", Title: title, Body: text}
+	return push
+}
+
+//NewLinkPush
+func NewLinkPush(title, text, link string) Push {
+	push := Push{Type: "note", Title: title, Body: text, Url: link}
 	return push
 }
