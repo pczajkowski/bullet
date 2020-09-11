@@ -2,8 +2,12 @@ package bullet
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
+	"mime"
 	"net/http"
+	"path/filepath"
+	"time"
 )
 
 const (
@@ -21,8 +25,8 @@ func NewBullet(token string) Bullet {
 	return b
 }
 
-func (b Bullet) newRequest(body io.Reader) (*http.Request, error) {
-	request, err := http.NewRequest(http.MethodPost, "https://api.pushbullet.com/v2/pushes", body)
+func (b Bullet) newRequest(body io.Reader, URL string) (*http.Request, error) {
+	request, err := http.NewRequest(http.MethodPost, URL, body)
 	if err != nil {
 		return nil, err
 	}
@@ -32,13 +36,21 @@ func (b Bullet) newRequest(body io.Reader) (*http.Request, error) {
 	return request, nil
 }
 
-func (b Bullet) send(push pushStruct) error {
+func (b Bullet) newRequestPush(body io.Reader) (*http.Request, error) {
+	return b.newRequest(body, "https://api.pushbullet.com/v2/pushes")
+}
+
+func (b Bullet) newRequestUpload(body io.Reader) (*http.Request, error) {
+	return b.newRequest(body, "https://api.pushbullet.com/v2/upload-request")
+}
+
+func (b Bullet) send(push pushInterface) error {
 	reader, errReader := push.getReader()
 	if errReader != nil {
 		return errReader
 	}
 
-	request, errRequest := b.newRequest(reader)
+	request, errRequest := b.newRequestPush(reader)
 	if errRequest != nil {
 		return errRequest
 	}
@@ -77,5 +89,97 @@ func (b Bullet) SendLink(title, text, link string) error {
 	linkPush := newLinkPush(title, text, link)
 	err := b.send(linkPush)
 
+	return err
+}
+
+func (b Bullet) requestUpload(file fileUpload) (*fileUpload, error) {
+	reader, errReader := file.getReader()
+	if errReader != nil {
+		return nil, errReader
+	}
+
+	request, errRequest := b.newRequestUpload(reader)
+	if errRequest != nil {
+		return nil, errRequest
+	}
+
+	client := http.Client{}
+	response, errResponse := client.Do(request)
+	if errResponse != nil {
+		return nil, errResponse
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		var errBullet bulletError
+		decoder := json.NewDecoder(response.Body)
+		errJSON := decoder.Decode(&errBullet)
+		if errJSON != nil {
+			return nil, errJSON
+		}
+
+		return nil, errBullet.getError()
+	}
+
+	var result fileUpload
+	decoder := json.NewDecoder(response.Body)
+	errJSON := decoder.Decode(&result)
+	if errJSON != nil {
+		return nil, errJSON
+	}
+
+	return &result, nil
+}
+
+func (b Bullet) uploadFile(path string) (*fileUpload, error) {
+	extension := filepath.Ext(path)
+	mimeType := mime.TypeByExtension(extension)
+	if mimeType == "" {
+		mimeType = "application/octet-stream"
+	}
+
+	filename := filepath.Base(path)
+	fileUpload := newFileUpload(filename, mimeType)
+
+	uploadResponse, errUpload := b.requestUpload(fileUpload)
+	if errUpload != nil {
+		return nil, errUpload
+	}
+
+	request, errRequest := getFileRequest(path, *uploadResponse)
+	if errRequest != nil {
+		return nil, errRequest
+	}
+
+	client := http.Client{}
+	response, errResponse := client.Do(request)
+	if errResponse != nil {
+		return nil, errResponse
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode < http.StatusOK || response.StatusCode >= http.StatusMultipleChoices {
+		return nil, fmt.Errorf("Error uploading file: %s", response.Status)
+	}
+
+	return uploadResponse, nil
+}
+
+//SendFile sends file push with given title, text and file
+func (b Bullet) SendFile(title, text, file string) error {
+	uploadResult, errUpload := b.uploadFile(file)
+	if errUpload != nil {
+		return errUpload
+	}
+
+	if title != "" {
+		uploadResult.Title = title
+	} else {
+		uploadResult.Title = time.Now().Format(shortTimeFormat)
+	}
+	uploadResult.Body = text
+	uploadResult.Type = "file"
+
+	err := b.send(uploadResult)
 	return err
 }
