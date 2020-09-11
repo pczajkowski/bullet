@@ -10,8 +10,15 @@ const (
 	shortTimeFormat = "2006-01-02 15:04"
 )
 
+//Bullet client for the Pushbullet API
 type Bullet struct {
-	Token string
+	token string
+}
+
+//NewBullet creates new Bullet using provided token
+func NewBullet(token string) Bullet {
+	b := Bullet{token: token}
+	return b
 }
 
 func (b Bullet) newRequest(body io.Reader) (*http.Request, error) {
@@ -20,7 +27,7 @@ func (b Bullet) newRequest(body io.Reader) (*http.Request, error) {
 		return nil, err
 	}
 
-	request.Header.Add("Access-Token", b.Token)
+	request.Header.Add("Access-Token", b.token)
 	request.Header.Add("Content-Type", "application/json")
 	return request, nil
 }
@@ -57,7 +64,7 @@ func (b Bullet) send(push Push) error {
 	return nil
 }
 
-//Send push note with given title and text
+//SendNote sends push note with given title and text
 func (b Bullet) SendNote(title, text string) error {
 	note := NewNotePush(title, text)
 	err := b.send(note)
@@ -65,7 +72,7 @@ func (b Bullet) SendNote(title, text string) error {
 	return err
 }
 
-//Send push link with given title, text and link
+//SendLink sends push link with given title, text and link
 func (b Bullet) SendLink(title, text, link string) error {
 	linkPush := NewLinkPush(title, text, link)
 	err := b.send(linkPush)
