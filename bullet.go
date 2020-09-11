@@ -51,14 +51,14 @@ func (b Bullet) send(push pushStruct) error {
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
-		var errBullet BulletError
+		var errBullet bulletError
 		decoder := json.NewDecoder(response.Body)
 		errJSON := decoder.Decode(&errBullet)
 		if errJSON != nil {
 			return errJSON
 		}
 
-		return errBullet.GetError()
+		return errBullet.getError()
 	}
 
 	return nil

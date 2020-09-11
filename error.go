@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-type BulletError struct {
+type bulletError struct {
 	Error struct {
 		Cat     string `json:"cat"`
 		Message string `json:"message"`
@@ -12,6 +12,6 @@ type BulletError struct {
 	} `json:"error"`
 }
 
-func (be BulletError) GetError() error {
+func (be bulletError) getError() error {
 	return fmt.Errorf("%s: %s", be.Error.Type, be.Error.Message)
 }
