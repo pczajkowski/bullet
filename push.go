@@ -5,15 +5,14 @@ import (
 	"encoding/json"
 )
 
-type Push struct {
+type pushStruct struct {
 	Type  string `json:"type"`
 	Title string `json:"title"`
 	Body  string `json:"body"`
 	Url   string `json:"url"`
 }
 
-//GetReader
-func (p Push) GetReader() (*bytes.Buffer, error) {
+func (p pushStruct) getReader() (*bytes.Buffer, error) {
 	jsonBytes, err := json.Marshal(p)
 	if err != nil {
 		return nil, err
@@ -23,14 +22,12 @@ func (p Push) GetReader() (*bytes.Buffer, error) {
 	return buffer, err
 }
 
-//NewNotePush
-func NewNotePush(title, text string) Push {
-	push := Push{Type: "note", Title: title, Body: text}
+func newNotePush(title, text string) pushStruct {
+	push := pushStruct{Type: "note", Title: title, Body: text}
 	return push
 }
 
-//NewLinkPush
-func NewLinkPush(title, text, link string) Push {
-	push := Push{Type: "note", Title: title, Body: text, Url: link}
+func newLinkPush(title, text, link string) pushStruct {
+	push := pushStruct{Type: "note", Title: title, Body: text, Url: link}
 	return push
 }
