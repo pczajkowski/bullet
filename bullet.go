@@ -44,6 +44,27 @@ func (b Bullet) newRequestUpload(body io.Reader) (*http.Request, error) {
 	return b.newRequest(body, "https://api.pushbullet.com/v2/upload-request")
 }
 
+func doRequest(request *http.Request) (*http.Response, error) {
+	client := http.Client{}
+	response, errResponse := client.Do(request)
+	if errResponse != nil {
+		return nil, errResponse
+	}
+
+	if response.StatusCode != http.StatusOK {
+		var errBullet bulletError
+		decoder := json.NewDecoder(response.Body)
+		errJSON := decoder.Decode(&errBullet)
+		if errJSON != nil {
+			return nil, errJSON
+		}
+
+		return nil, errBullet.getError()
+	}
+
+	return response, nil
+}
+
 func (b Bullet) send(push pushInterface) error {
 	reader, errReader := push.getReader()
 	if errReader != nil {
@@ -55,23 +76,11 @@ func (b Bullet) send(push pushInterface) error {
 		return errRequest
 	}
 
-	client := http.Client{}
-	response, errResponse := client.Do(request)
+	response, errResponse := doRequest(request)
 	if errResponse != nil {
 		return errResponse
 	}
 	defer response.Body.Close()
-
-	if response.StatusCode != http.StatusOK {
-		var errBullet bulletError
-		decoder := json.NewDecoder(response.Body)
-		errJSON := decoder.Decode(&errBullet)
-		if errJSON != nil {
-			return errJSON
-		}
-
-		return errBullet.getError()
-	}
 
 	return nil
 }
@@ -103,23 +112,11 @@ func (b Bullet) requestUpload(file fileUpload) (*fileUpload, error) {
 		return nil, errRequest
 	}
 
-	client := http.Client{}
-	response, errResponse := client.Do(request)
+	response, errResponse := doRequest(request)
 	if errResponse != nil {
 		return nil, errResponse
 	}
 	defer response.Body.Close()
-
-	if response.StatusCode != http.StatusOK {
-		var errBullet bulletError
-		decoder := json.NewDecoder(response.Body)
-		errJSON := decoder.Decode(&errBullet)
-		if errJSON != nil {
-			return nil, errJSON
-		}
-
-		return nil, errBullet.getError()
-	}
 
 	var result fileUpload
 	decoder := json.NewDecoder(response.Body)
