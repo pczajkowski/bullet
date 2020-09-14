@@ -2,7 +2,6 @@ package bullet
 
 import (
 	"bytes"
-	"encoding/json"
 )
 
 type pushStruct struct {
@@ -13,13 +12,7 @@ type pushStruct struct {
 }
 
 func (p pushStruct) getReader() (*bytes.Buffer, error) {
-	jsonBytes, err := json.Marshal(p)
-	if err != nil {
-		return nil, err
-	}
-
-	buffer := bytes.NewBuffer(jsonBytes)
-	return buffer, err
+	return getReader(p)
 }
 
 func newNotePush(title, text string) pushStruct {

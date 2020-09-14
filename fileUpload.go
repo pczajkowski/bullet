@@ -2,7 +2,6 @@ package bullet
 
 import (
 	"bytes"
-	"encoding/json"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -25,13 +24,7 @@ func newFileUpload(filename, fileType string) fileUpload {
 }
 
 func (f fileUpload) getReader() (*bytes.Buffer, error) {
-	jsonBytes, err := json.Marshal(f)
-	if err != nil {
-		return nil, err
-	}
-
-	buffer := bytes.NewBuffer(jsonBytes)
-	return buffer, err
+	return getReader(f)
 }
 
 func getFileRequest(filePath string, upload fileUpload) (*http.Request, error) {
