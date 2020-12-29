@@ -52,6 +52,8 @@ func doRequest(request *http.Request) (*http.Response, error) {
 	}
 
 	if response.StatusCode != http.StatusOK {
+		defer response.Body.Close()
+
 		var errBullet bulletError
 		decoder := json.NewDecoder(response.Body)
 		errJSON := decoder.Decode(&errBullet)
@@ -80,7 +82,7 @@ func (b Bullet) send(push pushInterface) error {
 	if errResponse != nil {
 		return errResponse
 	}
-	defer response.Body.Close()
+	response.Body.Close()
 
 	return nil
 }
