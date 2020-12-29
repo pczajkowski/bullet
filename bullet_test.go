@@ -28,3 +28,15 @@ func TestSendNote(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestSendLink(t *testing.T) {
+	server := fakeServer(http.StatusOK, "")
+	defer server.Close()
+
+	b := Bullet{token: "", baseURL: server.URL}
+
+	err := b.SendLink("test", "test", "url")
+	if err != nil {
+		t.Error(err)
+	}
+}
