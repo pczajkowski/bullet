@@ -8,6 +8,16 @@ import (
 	"testing"
 )
 
+var standardError string = `{
+  "error": {
+    "cat": "~(=^‥^)",
+    "message": "The resource could not be found.",
+    "type": "invalid_request"
+  }
+}`
+
+var standardErrorMessage string = "invalid_request: The resource could not be found."
+
 func fakeServer(statusCode int, data string) *httptest.Server {
 	function := func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -31,6 +41,23 @@ func TestSendNote(t *testing.T) {
 	}
 }
 
+func TestSendNoteFail(t *testing.T) {
+	server := fakeServer(http.StatusBadRequest, standardError)
+	server.Start()
+	defer server.Close()
+
+	b := Bullet{token: "", baseURL: server.URL}
+
+	err := b.SendNote("test", "test")
+	if err == nil {
+		t.Error("There should be error")
+	}
+
+	if err.Error() != standardErrorMessage {
+		t.Error(err)
+	}
+}
+
 func TestSendLink(t *testing.T) {
 	server := fakeServer(http.StatusOK, "")
 	server.Start()
@@ -40,6 +67,23 @@ func TestSendLink(t *testing.T) {
 
 	err := b.SendLink("test", "test", "url")
 	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestSendLinkFail(t *testing.T) {
+	server := fakeServer(http.StatusBadRequest, standardError)
+	server.Start()
+	defer server.Close()
+
+	b := Bullet{token: "", baseURL: server.URL}
+
+	err := b.SendLink("test", "test", "url")
+	if err == nil {
+		t.Error("There should be error")
+	}
+
+	if err.Error() != standardErrorMessage {
 		t.Error(err)
 	}
 }
@@ -66,6 +110,23 @@ func TestSendFile(t *testing.T) {
 
 	err = b.SendFile("test", "test", "./README.md")
 	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestSendFileFail(t *testing.T) {
+	server := fakeServer(http.StatusBadRequest, standardError)
+	server.Start()
+	defer server.Close()
+
+	b := Bullet{token: "", baseURL: server.URL}
+
+	err := b.SendFile("test", "test", "./README.md")
+	if err == nil {
+		t.Error("There should be error")
+	}
+
+	if err.Error() != standardErrorMessage {
 		t.Error(err)
 	}
 }
