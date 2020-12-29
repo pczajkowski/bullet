@@ -22,7 +22,7 @@ type Bullet struct {
 
 //NewBullet creates new Bullet using provided token
 func NewBullet(token string) Bullet {
-	b := Bullet{token: token, baseURL: "https://api.pushbullet.com/v2/"}
+	b := Bullet{token: token, baseURL: "https://api.pushbullet.com/v2"}
 	return b
 }
 
@@ -38,11 +38,11 @@ func (b Bullet) newRequest(body io.Reader, URL string) (*http.Request, error) {
 }
 
 func (b Bullet) newRequestPush(body io.Reader) (*http.Request, error) {
-	return b.newRequest(body, b.baseURL+"pushes")
+	return b.newRequest(body, b.baseURL+"/pushes")
 }
 
 func (b Bullet) newRequestUpload(body io.Reader) (*http.Request, error) {
-	return b.newRequest(body, b.baseURL+"upload-request")
+	return b.newRequest(body, b.baseURL+"/upload-request")
 }
 
 func doRequest(request *http.Request) (*http.Response, error) {
