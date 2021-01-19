@@ -16,6 +16,7 @@ type fileUpload struct {
 	Body      string `json:"body"`
 	FileUrl   string `json:"file_url"`
 	UploadUrl string `json:"upload_url"`
+	DeviceID  string `json:"device_iden"`
 }
 
 func newFileUpload(filename, fileType string) fileUpload {

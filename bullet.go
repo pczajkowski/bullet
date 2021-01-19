@@ -165,8 +165,8 @@ func (b Bullet) uploadFile(path string) (*fileUpload, error) {
 	return uploadResponse, nil
 }
 
-//SendFile sends file push with given title, text and file
-func (b Bullet) SendFile(title, text, file string) error {
+//SendFile sends file push with given title, text and file, use empty string as deviceID to send to all
+func (b Bullet) SendFile(title, text, file, deviceID string) error {
 	uploadResult, errUpload := b.uploadFile(file)
 	if errUpload != nil {
 		return errUpload
@@ -179,6 +179,7 @@ func (b Bullet) SendFile(title, text, file string) error {
 	}
 	uploadResult.Body = text
 	uploadResult.Type = "file"
+	uploadResult.DeviceID = deviceID
 
 	err := b.send(uploadResult)
 	return err

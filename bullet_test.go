@@ -108,7 +108,7 @@ func TestSendFile(t *testing.T) {
 
 	b := Bullet{token: "", baseURL: server.URL}
 
-	err = b.SendFile("test", "test", "./README.md")
+	err = b.SendFile("test", "test", "./README.md", "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -121,7 +121,7 @@ func TestSendFileFail(t *testing.T) {
 
 	b := Bullet{token: "", baseURL: server.URL}
 
-	err := b.SendFile("test", "test", "./README.md")
+	err := b.SendFile("test", "test", "./README.md", "")
 	if err == nil {
 		t.Error("There should be error")
 	}
