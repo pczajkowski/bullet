@@ -35,7 +35,7 @@ func TestSendNote(t *testing.T) {
 
 	b := Bullet{token: "", baseURL: server.URL}
 
-	err := b.SendNote("test", "test")
+	err := b.SendNote("test", "test", "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -48,7 +48,7 @@ func TestSendNoteFail(t *testing.T) {
 
 	b := Bullet{token: "", baseURL: server.URL}
 
-	err := b.SendNote("test", "test")
+	err := b.SendNote("test", "test", "")
 	if err == nil {
 		t.Error("There should be error")
 	}

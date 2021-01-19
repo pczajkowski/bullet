@@ -88,9 +88,9 @@ func (b Bullet) send(push pushInterface) error {
 	return nil
 }
 
-//SendNote sends push note with given title and text
-func (b Bullet) SendNote(title, text string) error {
-	note := newNotePush(title, text)
+//SendNote sends push note with given title and text, use empty string as deviceID to send to all
+func (b Bullet) SendNote(title, text, deviceID string) error {
+	note := newNotePush(title, text, deviceID)
 	err := b.send(note)
 
 	return err
@@ -184,6 +184,7 @@ func (b Bullet) SendFile(title, text, file string) error {
 	return err
 }
 
+// ListDevices returns Devices structure which contains slice of devices
 func (b Bullet) ListDevices() (*Devices, error) {
 	request, err := http.NewRequest(http.MethodGet, b.baseURL+"/devices", nil)
 	if err != nil {
