@@ -130,3 +130,42 @@ func TestSendFileFail(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestListDevices(t *testing.T) {
+	devicesJSON := `{
+  "devices": [
+    {
+      "active": true,
+      "app_version": 8623,
+      "created": 1412047948.579029,
+      "iden": "ujpah72o0sjAoRtnM0jc",
+      "manufacturer": "Apple",
+      "model": "iPhone 5s (GSM)",
+      "modified": 1412047948.579031,
+      "nickname": "Elon Musk's iPhone",
+      "push_token": "production:f73be0ee7877c8c7fa69b1468cde764f"
+    }
+  ]
+}`
+
+	server := fakeServer(http.StatusOK, devicesJSON)
+	server.Start()
+	defer server.Close()
+
+	b := Bullet{token: "", baseURL: server.URL}
+
+	devices, err := b.ListDevices()
+	if err != nil {
+		t.Error(err)
+	}
+
+	if devices == nil {
+		t.Error("Devices shouldn't be nil!")
+	}
+
+	expectedID := "ujpah72o0sjAoRtnM0jc"
+	deviceID := devices.Items[0].ID
+	if deviceID != expectedID {
+		t.Errorf("Device ID should be %s, but is %s", expectedID, deviceID)
+	}
+}

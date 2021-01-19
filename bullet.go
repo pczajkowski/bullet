@@ -183,3 +183,27 @@ func (b Bullet) SendFile(title, text, file string) error {
 	err := b.send(uploadResult)
 	return err
 }
+
+func (b Bullet) ListDevices() (*Devices, error) {
+	request, err := http.NewRequest(http.MethodGet, b.baseURL+"/devices", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	request.Header.Add("Access-Token", b.token)
+
+	response, errResponse := doRequest(request)
+	if errResponse != nil {
+		return nil, errResponse
+	}
+	defer response.Body.Close()
+
+	var result Devices
+	decoder := json.NewDecoder(response.Body)
+	errJSON := decoder.Decode(&result)
+	if errJSON != nil {
+		return nil, errJSON
+	}
+
+	return &result, nil
+}
