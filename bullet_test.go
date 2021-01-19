@@ -160,7 +160,7 @@ func TestListDevices(t *testing.T) {
 	}
 
 	if devices == nil {
-		t.Error("Devices shouldn't be nil!")
+		t.Fatal("Devices shouldn't be nil!")
 	}
 
 	expectedID := "ujpah72o0sjAoRtnM0jc"
