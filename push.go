@@ -21,7 +21,7 @@ func newNotePush(title, text, deviceID string) pushStruct {
 	return push
 }
 
-func newLinkPush(title, text, link string) pushStruct {
-	push := pushStruct{Type: "note", Title: title, Body: text, Url: link}
+func newLinkPush(title, text, link, deviceID string) pushStruct {
+	push := pushStruct{Type: "note", Title: title, Body: text, Url: link, DeviceID: deviceID}
 	return push
 }

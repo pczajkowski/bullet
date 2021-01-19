@@ -96,9 +96,9 @@ func (b Bullet) SendNote(title, text, deviceID string) error {
 	return err
 }
 
-//SendLink sends push link with given title, text and link
-func (b Bullet) SendLink(title, text, link string) error {
-	linkPush := newLinkPush(title, text, link)
+//SendLink sends push link with given title, text and link, use empty string as deviceID to send to all
+func (b Bullet) SendLink(title, text, link, deviceID string) error {
+	linkPush := newLinkPush(title, text, link, deviceID)
 	err := b.send(linkPush)
 
 	return err

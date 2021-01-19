@@ -65,7 +65,7 @@ func TestSendLink(t *testing.T) {
 
 	b := Bullet{token: "", baseURL: server.URL}
 
-	err := b.SendLink("test", "test", "url")
+	err := b.SendLink("test", "test", "url", "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -78,7 +78,7 @@ func TestSendLinkFail(t *testing.T) {
 
 	b := Bullet{token: "", baseURL: server.URL}
 
-	err := b.SendLink("test", "test", "url")
+	err := b.SendLink("test", "test", "url", "")
 	if err == nil {
 		t.Error("There should be error")
 	}
