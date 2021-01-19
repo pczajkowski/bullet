@@ -5,25 +5,32 @@
 
 	b := bullet.NewBullet("YOUR_TOKEN")
 
-**Send note**
+**Send note, use empty string in place of deviceID to send to all devices**
 
-	err := b.SendNote("testTitle", "testText")
+	err := b.SendNote("testTitle", "testText", "deviceID")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-**Send link**
+**Send link, use empty string in place of deviceID to send to all devices**
 
-	err := b.SendLink("testTitle", "testText", "https://abc.com")
+	err := b.SendLink("testTitle", "testText", "https://abc.com", "deviceID")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-**Send file**
+**Send file, use empty string in place of deviceID to send to all devices**
 
-	err := b.SendFile("testFile", "Something", "./test.txt")
+	err := b.SendFile("testFile", "Something", "./test.txt", "deviceID")
 	if err != nil {
 		log.Fatal(err)
+	}
+
+**List devices**
+
+	devices, err := b.ListDevices()
+	if err != nil {
+		t.Error(err)
 	}
 
 
