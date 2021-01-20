@@ -15,5 +15,6 @@ type Push struct {
 }
 
 type Pushes struct {
-	Items []Push `json:"pushes"`
+	Items  []Push `json:"pushes"`
+	Cursor string `json:"cursor"`
 }
