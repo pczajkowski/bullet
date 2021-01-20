@@ -186,9 +186,8 @@ func (b Bullet) SendFile(title, text, file, deviceID string) error {
 	return err
 }
 
-// ListDevices returns Devices structure which contains slice of devices
-func (b Bullet) ListDevices() (*Devices, error) {
-	request, err := http.NewRequest(http.MethodGet, b.baseURL+"/devices", nil)
+func (b Bullet) get(URL string) (io.ReadCloser, error) {
+	request, err := http.NewRequest(http.MethodGet, URL, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -199,10 +198,20 @@ func (b Bullet) ListDevices() (*Devices, error) {
 	if errResponse != nil {
 		return nil, errResponse
 	}
-	defer response.Body.Close()
+
+	return response.Body, nil
+}
+
+// ListDevices returns Devices structure which contains slice of devices
+func (b Bullet) ListDevices() (*Devices, error) {
+	body, err := b.get(b.baseURL + "/devices")
+	if err != nil {
+		return nil, err
+	}
+	defer body.Close()
 
 	var result Devices
-	decoder := json.NewDecoder(response.Body)
+	decoder := json.NewDecoder(body)
 	errJSON := decoder.Decode(&result)
 	if errJSON != nil {
 		return nil, errJSON
@@ -232,21 +241,14 @@ func (b Bullet) ListPushes(active bool, modifiedAfter *time.Time, limit int, cur
 	params.Add("cursor", cursor)
 	URL := fmt.Sprintf("%s/pushes?%s", b.baseURL, params.Encode())
 
-	request, err := http.NewRequest(http.MethodGet, URL, nil)
+	body, err := b.get(URL)
 	if err != nil {
 		return nil, err
 	}
-
-	request.Header.Add("Access-Token", b.token)
-
-	response, errResponse := doRequest(request)
-	if errResponse != nil {
-		return nil, errResponse
-	}
-	defer response.Body.Close()
+	defer body.Close()
 
 	var result Pushes
-	decoder := json.NewDecoder(response.Body)
+	decoder := json.NewDecoder(body)
 	errJSON := decoder.Decode(&result)
 	if errJSON != nil {
 		return nil, errJSON
