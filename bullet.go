@@ -220,7 +220,7 @@ func (b Bullet) ListDevices() (*Devices, error) {
 	return &result, nil
 }
 
-// ListPushes returns Pushes structure which contains slice of pushes
+// ListPushes returns Pushes structure which contains slice of pushes, limit <= 0 gives default of 500
 func (b Bullet) ListPushes(active bool, modifiedAfter *time.Time, limit int, cursor string) (*Pushes, error) {
 	params := url.Values{}
 
