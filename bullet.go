@@ -6,6 +6,7 @@ import (
 	"io"
 	"mime"
 	"net/http"
+	"net/url"
 	"path/filepath"
 	"time"
 )
@@ -201,6 +202,50 @@ func (b Bullet) ListDevices() (*Devices, error) {
 	defer response.Body.Close()
 
 	var result Devices
+	decoder := json.NewDecoder(response.Body)
+	errJSON := decoder.Decode(&result)
+	if errJSON != nil {
+		return nil, errJSON
+	}
+
+	return &result, nil
+}
+
+// ListPushes returns Pushes structure which contains slice of pushes
+func (b Bullet) ListPushes(active bool, modifiedAfter *time.Time, limit int, cursor string) (*Pushes, error) {
+	params := url.Values{}
+
+	if active {
+		params.Add("active", "true")
+	} else {
+		params.Add("active", "false")
+	}
+
+	if modifiedAfter != nil {
+		params.Add("modified_after", fmt.Sprint(modifiedAfter.Unix()))
+	}
+
+	if limit > 0 {
+		params.Add("limit", fmt.Sprint(limit))
+	}
+
+	params.Add("cursor", cursor)
+	URL := fmt.Sprintf("%s/pushes?%s", b.baseURL, params.Encode())
+
+	request, err := http.NewRequest(http.MethodGet, URL, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	request.Header.Add("Access-Token", b.token)
+
+	response, errResponse := doRequest(request)
+	if errResponse != nil {
+		return nil, errResponse
+	}
+	defer response.Body.Close()
+
+	var result Pushes
 	decoder := json.NewDecoder(response.Body)
 	errJSON := decoder.Decode(&result)
 	if errJSON != nil {

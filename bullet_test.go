@@ -169,3 +169,49 @@ func TestListDevices(t *testing.T) {
 		t.Errorf("Device ID should be %s, but is %s", expectedID, deviceID)
 	}
 }
+
+func TestListPushes(t *testing.T) {
+	pushesJSON := `{
+  "pushes": [
+    {
+      "active": true,
+      "body": "Space Elevator, Mars Hyperloop, Space Model S (Model Space?)",
+      "created": 1412047948.579029,
+      "direction": "self",
+      "dismissed": false,
+      "iden": "ujpah72o0sjAoRtnM0jc",
+      "modified": 1412047948.579031,
+      "receiver_email": "elon@teslamotors.com",
+      "receiver_email_normalized": "elon@teslamotors.com",
+      "receiver_iden": "ujpah72o0",
+      "sender_email": "elon@teslamotors.com",
+      "sender_email_normalized": "elon@teslamotors.com",
+      "sender_iden": "ujpah72o0",
+      "sender_name": "Elon Musk",
+      "title": "Space Travel Ideas",
+      "type": "note"
+    }
+  ]
+}`
+
+	server := fakeServer(http.StatusOK, pushesJSON)
+	server.Start()
+	defer server.Close()
+
+	b := Bullet{token: "", baseURL: server.URL}
+
+	pushes, err := b.ListPushes(true, nil, 10, "")
+	if err != nil {
+		t.Error(err)
+	}
+
+	if pushes == nil {
+		t.Fatal("Pushes shouldn't be nil!")
+	}
+
+	expectedID := "ujpah72o0sjAoRtnM0jc"
+	pushID := pushes.Items[0].ID
+	if pushID != expectedID {
+		t.Errorf("Push ID should be %s, but is %s", expectedID, pushID)
+	}
+}
