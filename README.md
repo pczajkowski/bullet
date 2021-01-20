@@ -33,7 +33,7 @@
 		t.Error(err)
 	}
 
-**List pushes, all pushes (modifiedAfter can be nil, limit <= 0 gives default of 500)**
+**List all active pushes (modifiedAfter can be nil, limit <= 0 gives default of 500)**
 
 	devices, err := b.ListPushes(true, nil, 0, "")
 	if err != nil {
