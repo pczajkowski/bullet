@@ -33,7 +33,7 @@
 		t.Error(err)
 	}
 
-**List all active pushes (modifiedAfter can be nil, limit <= 0 gives default of 500)**
+**List all active pushes (modifiedAfter can be nil, limit <= 0 gives default of 500). Cursor is returned with every call (in Devices struct) and is used for pagination, so if you want to see next page of results in your next call provide cursor received from the last call.**
 
 	devices, err := b.ListPushes(true, nil, 0, "")
 	if err != nil {
