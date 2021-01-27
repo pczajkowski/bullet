@@ -1,5 +1,6 @@
 # bullet
 [![Go Report Card](https://goreportcard.com/badge/github.com/pczajkowski/bullet)](https://goreportcard.com/report/github.com/pczajkowski/bullet)
+[![DeepSource](https://deepsource.io/gh/pczajkowski/bullet.svg/?label=active+issues&show_trend=true)](https://deepsource.io/gh/pczajkowski/bullet/?ref=repository-badge)
 
 **Initialize client**
 
